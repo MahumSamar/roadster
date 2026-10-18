@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Roadster — Drive the Future</title>
+<meta name="description" content="The electric roadster that lifts off the ground. Tri-motor power, thruster package, 960 km of range.">
+<meta name="theme-color" content="#07080a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20261018_172559_b0014e8c-685a-4848-b845-a91743651e7f.png">
+<style>
+  :root{
+    --bg:#07080a;
+    --bg-2:#0d0f12;
+    --ink:#f2f3f5;
+    --muted:#9aa0a8;
+    --line:rgba(255,255,255,.14);
+    --line-strong:rgba(255,255,255,.28);
+    --chip:rgba(14,16,19,.62);
+    --thrust:#a9cfff;
+    --display:"Anton", "Impact", sans-serif;
+    --body:"Manrope", "Segoe UI", sans-serif;
+    --gutter:clamp(16px, 3.4vw, 44px);
+    --ease:cubic-bezier(.2,.7,.2,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{background:var(--bg);color-scheme:dark}
+  body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  :focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:6px}
+  img{display:block;max-width:100%}
+
+  /* ---------- NAV ---------- */
+  .nav{position:fixed;inset:0 0 auto 0;z-index:50;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:20px var(--gutter);transition:background .4s var(--ease), padding .4s var(--ease)}
+  .nav.scrolled{background:linear-gradient(to bottom, rgba(7,8,10,.85), rgba(7,8,10,0));}
+  .nav-links{display:flex;gap:clamp(18px,2.6vw,40px);font-size:14px;font-weight:500}
+  .nav-links a{opacity:.9;transition:opacity .2s}
+  .nav-links a:hover{opacity:1}
+  .logo{display:grid;place-items:center;width:40px;height:40px}
+  .logo svg{width:22px;height:30px}
+  .nav-right{display:flex;align-items:center;justify-content:flex-end;gap:18px}
+  .lang{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:6px 4px;position:relative}
+  .lang svg{width:10px;height:10px;transition:transform .25s}
+  .lang[aria-expanded="true"] svg{transform:rotate(180deg)}
+  .lang-menu{position:absolute;top:calc(100% + 8px);right:0;background:#121418;border:1px solid var(--line);border-radius:12px;padding:6px;min-width:110px;display:none}
+  .lang-menu.open{display:block}
+  .lang-menu button{display:block;width:100%;text-align:left;padding:8px 10px;border-radius:8px;font-size:13px}
+  .lang-menu button:hover{background:rgba(255,255,255,.06)}
+  .divider{width:1px;height:22px;background:var(--line-strong)}
+  .socials{display:flex;gap:16px;align-items:center}
+  .socials a{display:grid;place-items:center;width:20px;height:20px;opacity:.9}
+  .socials svg{width:16px;height:16px;fill:currentColor}
+  .toggle{width:36px;height:20px;border-radius:20px;background:#55595f;position:relative;transition:background .3s}
+  .toggle::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .3s var(--ease)}
+  .toggle[aria-pressed="true"]{background:#8b9097}
+  .toggle[aria-pressed="true"]::after{transform:translateX(16px)}
+  .menu-btn{display:none;width:40px;height:40px;place-items:center}
+  .menu-btn span{display:block;width:20px;height:1.5px;background:#fff;box-shadow:0 6px 0 #fff}
+
+  /* ---------- STAGE ---------- */
+  #stage{position:relative;height:640vh}
+  .sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;isolation:isolate}
+  .bg{position:absolute;inset:0;background-size:cover;background-position:center;will-change:opacity, transform}
+  .bg1{background-image:url("https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20261018_172559_b0014e8c-685a-4848-b845-a91743651e7f.png")}
+  .bg2{background-image:url("https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20261018_172559_28889147-787a-4567-8b27-5de3264916ab.png");opacity:0}
+  /* soft tonal wash: keeps edges deep black and gradients silky */
+  .wash{position:absolute;inset:0;background:
+      radial-gradient(120% 80% at 50% 38%, rgba(7,8,10,0) 40%, rgba(7,8,10,.75) 100%),
+      linear-gradient(to bottom, rgba(7,8,10,.35), rgba(7,8,10,0) 22%, rgba(7,8,10,0) 80%, rgba(7,8,10,.9));
+    pointer-events:none}
+  .outline{position:absolute;left:50%;top:11%;transform:translateX(-50%);font-family:var(--display);font-weight:400;font-size:clamp(84px, 23.5vw, 420px);line-height:.86;letter-spacing:.005em;white-space:nowrap;color:transparent;-webkit-text-stroke:1.2px rgba(255,255,255,.5);
+    -webkit-mask-image:linear-gradient(to bottom,#000 30%,rgba(0,0,0,.15) 95%);mask-image:linear-gradient(to bottom,#000 30%,rgba(0,0,0,.15) 95%);
+    pointer-events:none;user-select:none;will-change:transform,opacity;transform-origin:50% 0}
+  .outline span{display:inline-block;transform:scaleY(1.22);transform-origin:50% 0}
+  #gl{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:2}
+  .panel{position:absolute;z-index:3;will-change:opacity, transform}
+
+  /* hero */
+  .hero{left:var(--gutter);top:30%;max-width:min(440px, 90vw)}
+  .hero h1{font-family:var(--display);font-weight:400;font-size:clamp(46px,5.2vw,78px);line-height:.98;letter-spacing:.005em;text-transform:uppercase;
+    background:linear-gradient(180deg,#ffffff 0%,#d9dce0 45%,#8f959c 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{margin-top:14px;font-size:clamp(15px,1.35vw,18px);color:#dfe2e6}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:48px;padding:0 26px;border-radius:999px;background:#fff;color:#0a0b0d;font-weight:700;font-size:14px;transition:transform .3s var(--ease), box-shadow .3s var(--ease)}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px -10px rgba(255,255,255,.45)}
+  .btn-ghost{background:transparent;color:#fff;border:1px solid var(--line-strong)}
+  .btn-ghost:hover{box-shadow:none;border-color:#fff}
+  .hero .btn{margin-top:24px}
+
+  .eyebrow{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);font-weight:600}
+
+  /* side panel */
+  .side{inset:0;opacity:0;pointer-events:none}
+  .side-title{position:absolute;left:var(--gutter);top:17%}
+  .side-title h2{font-family:var(--display);font-weight:400;font-size:clamp(44px,5.6vw,92px);line-height:.92;text-transform:uppercase}
+  .side-title p{margin-top:14px;color:#c9cdd2;max-width:34ch}
+  .chip{position:absolute;display:inline-flex;align-items:center;gap:10px;padding:9px 14px 9px 10px;border-radius:12px;background:var(--chip);border:1px solid var(--line);font-size:13px;font-weight:600;white-space:nowrap;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;transform:translateY(14px)}
+  .chip i{display:grid;place-items:center;width:24px;height:24px;border-radius:7px;background:rgba(255,255,255,.08);border:1px solid var(--line)}
+  .chip svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .chip b{font-weight:700}
+  .chip span{color:var(--muted);font-weight:500}
+
+  /* top-down panel */
+  .top{inset:0;opacity:0;pointer-events:none}
+  .top-head{position:absolute;left:50%;top:10%;transform:translateX(-50%);text-align:center;width:100%}
+  .top-head h2{font-family:var(--display);font-weight:400;font-size:clamp(28px,3vw,44px);text-transform:uppercase;line-height:1}
+  .cards{position:absolute;inset:0}
+  .card{position:absolute;width:clamp(210px,19vw,290px);padding:16px 18px 18px;border-radius:16px;background:rgba(12,14,17,.66);border:1px solid var(--line);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;transform:translateY(16px)}
+  .card i{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.08);border:1px solid var(--line);margin-bottom:12px}
+  .card svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .card h3{font-size:15px;font-weight:700}
+  .card p{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.45}
+  .cards{display:grid;grid-template-columns:auto 1fr auto;grid-template-rows:repeat(3,auto);align-content:center;row-gap:14px;padding:9vh var(--gutter) 0}
+  .card{position:relative}
+  .c1,.c2,.c3{grid-column:1}.c4,.c5,.c6{grid-column:3}
+  .c1,.c4{grid-row:1}.c2,.c5{grid-row:2}.c3,.c6{grid-row:3}
+
+  .cue{position:absolute;z-index:3;left:50%;bottom:22px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .cue i{width:1px;height:34px;background:linear-gradient(#fff,transparent);animation:cue 2.2s var(--ease) infinite;transform-origin:top}
+  @keyframes cue{0%{transform:scaleY(0);opacity:1}60%{transform:scaleY(1);opacity:1}100%{transform:scaleY(1);opacity:0}}
+
+  /* ---------- LOADER ---------- */
+  .loader{position:fixed;inset:0;z-index:100;background:var(--bg);display:grid;place-items:center;transition:opacity .9s var(--ease), visibility .9s}
+  .loader.done{opacity:0;visibility:hidden}
+  .loader-inner{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .loader svg{width:30px;height:42px;animation:pulse 1.6s ease-in-out infinite}
+  @keyframes pulse{50%{opacity:.35}}
+  .bar{width:160px;height:1px;background:var(--line);overflow:hidden}
+  .bar i{display:block;height:100%;width:0;background:#fff;transition:width .3s}
+  .loader small{font-size:11px;letter-spacing:.22em;color:var(--muted);font-variant-numeric:tabular-nums}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 860px){
+    .nav{grid-template-columns:auto 1fr auto;padding:14px var(--gutter)}
+    .nav-links,.socials,.divider{display:none}
+    .menu-btn{display:grid}
+    .logo{justify-self:center}
+    .nav-right{gap:12px}
+    .nav-links.open{display:flex;position:fixed;inset:68px 12px auto 12px;flex-direction:column;gap:0;background:#111317;border:1px solid var(--line);border-radius:16px;padding:8px}
+    .nav-links.open a{padding:14px 12px;border-radius:10px;font-size:16px}
+    .outline{top:17%;font-size:25vw}
+    .outline span{transform:scaleY(1.7)}
+    .hero{top:auto;bottom:9%;left:var(--gutter);right:var(--gutter)}
+    .hero h1{font-size:clamp(44px,12vw,64px)}
+    .side-title{top:13%;right:var(--gutter)}
+    .side-title h2{font-size:clamp(40px,12vw,64px)}
+    .top-head{top:10%}
+    .cards{inset:auto 0 0 0;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 var(--gutter) 18px}
+    .cards{grid-template-rows:none;align-content:end;row-gap:8px}
+    .c1,.c2,.c3,.c4,.c5,.c6{grid-column:auto;grid-row:auto}
+    .card{position:static;width:auto;padding:10px 12px;border-radius:12px}
+    .card i{width:24px;height:24px;margin-bottom:6px;border-radius:7px}
+    .card svg{width:12px;height:12px}
+    .card h3{font-size:13px}
+    .card p{display:none}
+  }
+  @media (max-width: 520px){
+    .chip{font-size:12px;padding:7px 11px 7px 8px}
+    .chip span{display:none}
+    .lang{display:none}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .cue i{animation:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="loader" id="loader" role="status" aria-live="polite">
+  <div class="loader-inner">
+    <svg viewBox="0 0 22 30" aria-hidden="true"><path d="M13.6 0 1.4 16.9h8.2L7.9 30 20.6 12.4h-8.3z" fill="#fff"/></svg>
+    <div class="bar"><i id="barFill"></i></div>
+    <small id="loadPct">LOADING 0%</small>
+  </div>
+</div>
+
+<header class="nav" id="nav">
+  <nav class="nav-links" id="navLinks" aria-label="Primary">
+    <a href="#top">Shop</a>
+    <a href="#top">Customize</a>
+    <a href="#top">Reviews</a>
+    <a href="#top">Contact</a>
+  </nav>
+  <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks"><span></span></button>
+  <a href="#top" class="logo" aria-label="Roadster home">
+    <svg viewBox="0 0 22 30" aria-hidden="true"><path d="M13.6 0 1.4 16.9h8.2L7.9 30 20.6 12.4h-8.3z" fill="#fff"/></svg>
+  </a>
+  <div class="nav-right">
+    <div style="position:relative">
+      <button class="lang" id="langBtn" aria-haspopup="true" aria-expanded="false"><span id="langLabel">ENG</span>
+        <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" stroke="#fff" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg></button>
+      <div class="lang-menu" id="langMenu" role="menu">
+        <button role="menuitem" data-l="ENG">English</button>
+        <button role="menuitem" data-l="DEU">Deutsch</button>
+        <button role="menuitem" data-l="ESP">Español</button>
+      </div>
+    </div>
+    <span class="divider" aria-hidden="true"></span>
+    <div class="socials">
+      <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8C2.4 3.9 3.9 2.4 7.2 2.3 8.4 2.2 8.8 2.2 12 2.2zM12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1 0 8.3 0 8.7 0 12s0 3.7.1 4.9c.2 4.4 2.6 6.8 7 7 1.2.1 1.6.1 4.9.1s3.7 0 4.9-.1c4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 1 0 0 12.4 6.2 6.2 0 0 0 0-12.4zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.4-11.8a1.4 1.4 0 1 0 0 2.9 1.4 1.4 0 0 0 0-2.9z"/></svg></a>
+      <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg></a>
+      <a href="#" aria-label="X"><svg viewBox="0 0 24 24"><path d="M18.2 2.3h3.4l-7.4 8.4 8.7 11.5h-6.8l-5.3-7-6.1 7H1.3l7.9-9L.8 2.3h7l4.8 6.4 5.6-6.4zm-1.2 17.9h1.9L6.9 4.2H4.9l12.1 16z"/></svg></a>
+    </div>
+    <button class="toggle" id="lightsToggle" aria-pressed="true" aria-label="Studio lights"></button>
+  </div>
+</header>
+
+<main id="top">
+  <section id="stage" aria-label="Roadster flight sequence">
+    <div class="sticky">
+      <div class="bg bg1" id="bg1"></div>
+      <div class="bg bg2" id="bg2"></div>
+      <div class="wash"></div>
+      <div class="outline" id="outline" aria-hidden="true"><span>ROADSTER</span></div>
+      <canvas id="gl" aria-hidden="true"></canvas>
+
+      <div class="panel hero" id="pHero">
+        <h1>Drive the<br>future</h1>
+        <p>Electric performance, redefined.</p>
+        <a class="btn" href="#top">Shop now</a>
+      </div>
+
+
+      <div class="panel side" id="pSide">
+        <div class="side-title">
+          <div class="eyebrow">Model 02</div>
+          <h2>Roadster<br>Type 01</h2>
+          <p>Hand-laid carbon body, open sky above, three motors below.</p>
+        </div>
+        <div class="chip" data-x="22" data-y="56"><i><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></i><b>0–100 km/h</b><span>1.9 s</span></div>
+        <div class="chip" data-x="44" data-y="78"><i><svg viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 11v2"/></svg></i><b>960 km</b><span>range</span></div>
+        <div class="chip" data-x="3" data-y="66"><i><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i><b>410 km/h</b><span>top speed</span></div>
+        <div class="chip" data-x="20" data-y="76"><i><svg viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4M5 21h14"/></svg></i><b>Air thrusters</b><span>×10</span></div>
+        <div class="chip" data-x="6" data-y="86"><i><svg viewBox="0 0 24 24"><path d="M4 18h16M6 18l2-6h8l2 6M9 12l1-4h4l1 4"/></svg></i><b>Carbon tub</b><span>1,380 kg</span></div>
+      </div>
+
+      <div class="panel top" id="pTop">
+        <div class="top-head"><div class="eyebrow">From above</div><h2>Built to every angle</h2></div>
+        <div class="cards">
+          <div class="card c1"><i><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></i><h3>Tri-motor drive</h3><p>One motor up front, two at the rear, torque vectored per wheel in under a millisecond.</p></div>
+          <div class="card c2"><i><svg viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 11v2M6 10v4M10 10v4"/></svg></i><h3>200 kWh pack</h3><p>Structural cells in the floor keep the center of gravity 40 mm lower.</p></div>
+          <div class="card c3"><i><svg viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4M5 21h14"/></svg></i><h3>Thruster package</h3><p>Ten nozzles for launch, braking and short hover.</p></div>
+          <div class="card c4"><i><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></i><h3>Active aero</h3><p>The rear deck lifts and the floor seals at speed.</p></div>
+          <div class="card c5"><i><svg viewBox="0 0 24 24"><path d="M5 12a7 7 0 0 1 14 0v6H5z"/><path d="M9 18v3M15 18v3"/></svg></i><h3>Four seats, no roof</h3><p>The glass targa stows in the trunk in eleven seconds.</p></div>
+          <div class="card c6"><i><svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4"/></svg></i><h3>18-minute charge</h3><p>10 to 80 percent on any 350 kW charger.</p></div>
+        </div>
+      </div>
+
+      <div class="cue" id="cue" aria-hidden="true">Scroll<i></i></div>
+    </div>
+  </section>
+
+</main>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+/* ================= CONFIG ================= */
+// 3D car model generated in Higgsfield (multi-view → 3D), loaded straight from its URL.
+const MODELS = {
+  tripo:   'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20261018_172544_35da5d62-b0db-48ff-8fd8-86c1e8012708.glb',
+  hunyuan: 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20261018_172547_27158316-44cc-4848-a85b-5dac41faaa80.glb'
+};
+const qs = new URLSearchParams(location.search);
+const MODEL_URL = MODELS[qs.get('model')] || MODELS.hunyuan;
+const MODEL_YAW = parseFloat(qs.get('yaw') ?? 'NaN');   // manual override for front direction (radians)
+const CAR_LEN = 4.6;                                      // metres; the scene uses metres
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ================= HELPERS ================= */
+const clamp = (v, a=0, b=1) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const smooth = t => t * t * (3 - 2 * t);
+const ease = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+const range = (p, a, b) => clamp((p - a) / (b - a));
+const band = (p, a, b, c, d) => Math.min(range(p, a, b), 1 - range(p, c, d));
+
+function radialTexture(stops, size = 256) {
+  const c = document.createElement('canvas'); c.width = c.height = size;
+  const g = c.getContext('2d');
+  const grd = g.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+  stops.forEach(([o, col]) => grd.addColorStop(o, col));
+  g.fillStyle = grd; g.fillRect(0, 0, size, size);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+
+/* ================= RENDERER ================= */
+const canvas = document.getElementById('gl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+renderer.setClearColor(0x000000, 0);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+
+const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 200);
+
+const hemi = new THREE.HemisphereLight(0xdfe6ff, 0x0a0a0a, 0.35); scene.add(hemi);
+const key = new THREE.DirectionalLight(0xffffff, 2.2); key.position.set(-4, 8, 6); scene.add(key);
+const rim = new THREE.DirectionalLight(0xcfd8ff, 2.6); rim.position.set(3, 4, -7); scene.add(rim);
+const top = new THREE.DirectionalLight(0xffffff, 0.9); top.position.set(0, 10, 0); scene.add(top);
+
+/* ================= CAR RIG ================= */
+// carRoot: position + yaw   carTilt: pitch/roll   model: normalised mesh (front → -X, wheels on y=0)
+const carRoot = new THREE.Group(); const carTilt = new THREE.Group();
+carRoot.add(carTilt); scene.add(carRoot);
+// mirrored copy for the glossy floor reflection
+const reflRoot = new THREE.Group(); reflRoot.scale.y = -1; scene.add(reflRoot);
+const reflCar = new THREE.Group(); const reflTilt = new THREE.Group();
+reflCar.add(reflTilt); reflRoot.add(reflCar);
+const reflMats = [];
+let carDims = new THREE.Vector3(CAR_LEN, 1.2, 2);
+
+// contact shadow
+const shadowTex = radialTexture([[0,'rgba(0,0,0,0.95)'],[0.45,'rgba(0,0,0,0.6)'],[1,'rgba(0,0,0,0)']]);
+const shadow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false }));
+shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.004; shadow.renderOrder = 1; scene.add(shadow);
+
+/* ================= AIR BURST FX ================= */
+const N = reduceMotion ? 0 : 1400;
+const pPos = new Float32Array(N * 3), pVel = new Float32Array(N * 3);
+const pAge = new Float32Array(N), pLife = new Float32Array(N), pSize = new Float32Array(N), pAlpha = new Float32Array(N), pBase = new Float32Array(N);
+const pGeo = new THREE.BufferGeometry();
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3).setUsage(THREE.DynamicDrawUsage));
+pGeo.setAttribute('aSize', new THREE.BufferAttribute(pSize, 1).setUsage(THREE.DynamicDrawUsage));
+pGeo.setAttribute('aAlpha', new THREE.BufferAttribute(pAlpha, 1).setUsage(THREE.DynamicDrawUsage));
+const pMat = new THREE.ShaderMaterial({
+  uniforms: { uScale: { value: 400 }, uColor: { value: new THREE.Color(0xd6e6ff) } },
+  vertexShader: `attribute float aSize; attribute float aAlpha; varying float vA; uniform float uScale;
+    void main(){ vec4 mv = modelViewMatrix * vec4(position,1.0); gl_PointSize = aSize * uScale / -mv.z; gl_Position = projectionMatrix * mv; vA = aAlpha; }`,
+  fragmentShader: `uniform vec3 uColor; varying float vA;
+    void main(){ float d = length(gl_PointCoord - 0.5); float a = smoothstep(0.5, 0.0, d); a *= a; gl_FragColor = vec4(uColor, a * vA); }`,
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+});
+const points = new THREE.Points(pGeo, pMat); points.frustumCulled = false; points.renderOrder = 3; scene.add(points);
+for (let i = 0; i < N; i++) pAge[i] = pLife[i] = 1;
+let pCursor = 0;
+
+// soft haze puffs (smooth radial sprites, no texture noise)
+const hazeTex = radialTexture([[0,'rgba(255,255,255,0.55)'],[0.35,'rgba(235,240,255,0.22)'],[1,'rgba(255,255,255,0)']]);
+const haze = [];
+for (let i = 0; i < (reduceMotion ? 0 : 26); i++) {
+  const s = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: hazeTex, transparent: true, depthWrite: false, opacity: 0, blending: THREE.AdditiveBlending }));
+  s.rotation.x = -Math.PI / 2; s.position.y = 0.03; s.renderOrder = 2; s.userData = { age: 1, life: 1, vx: 0, vz: 0, s0: 1, s1: 1, o: 0 };
+  scene.add(s); haze.push(s);
+}
+let hazeCursor = 0;
+function puff(x, z, n, strength = 1) {
+  for (let k = 0; k < n; k++) {
+    const s = haze[hazeCursor++ % haze.length]; if (!s) return;
+    const a = Math.random() * Math.PI * 2, sp = (0.4 + Math.random() * 1.2) * strength;
+    Object.assign(s.userData, { age: 0, life: 2 + Math.random() * 1.6, vx: Math.cos(a) * sp, vz: Math.sin(a) * sp, s0: 1.2 + Math.random(), s1: 5 + Math.random() * 4 * strength, o: 0.10 + 0.08 * strength });
+    s.position.set(x + Math.cos(a) * 0.6, 0.03 + Math.random() * 0.05, z + Math.sin(a) * 0.4);
+  }
+}
+
+// floor shockwave rings
+function ringTexture() {
+  const size = 512, c = document.createElement('canvas'); c.width = c.height = size;
+  const g = c.getContext('2d');
+  const grd = g.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+  grd.addColorStop(0, 'rgba(255,255,255,0)'); grd.addColorStop(0.62, 'rgba(255,255,255,0)');
+  grd.addColorStop(0.84, 'rgba(220,232,255,0.85)'); grd.addColorStop(0.9, 'rgba(255,255,255,0.35)'); grd.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = grd; g.fillRect(0, 0, size, size);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const ringTex = ringTexture();
+const rings = [0, 1, 2].map(() => {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: ringTex, transparent: true, depthWrite: false, opacity: 0, blending: THREE.AdditiveBlending }));
+  m.rotation.x = -Math.PI / 2; m.position.y = 0.01; m.userData = { age: 1, life: 1, max: 1, o: 0 }; scene.add(m); return m;
+});
+let ringCursor = 0;
+function shockwave(x, z, strength = 1) {
+  if (reduceMotion) return;
+  const r = rings[ringCursor++ % rings.length];
+  Object.assign(r.userData, { age: 0, life: 1.3, max: 7 + 5 * strength, o: 0.55 * strength });
+  r.position.x = x; r.position.z = z;
+}
+
+// thruster glows under the car
+const glowTex = radialTexture([[0,'rgba(255,255,255,1)'],[0.2,'rgba(190,215,255,0.65)'],[1,'rgba(150,190,255,0)']]);
+const glows = [];
+const NOZZLES = [[-0.36, -0.30], [-0.36, 0.30], [0.30, -0.32], [0.30, 0.32], [0.0, 0.0]];   // fractions of length / width
+NOZZLES.forEach(() => {
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, transparent: true, depthWrite: false, opacity: 0, blending: THREE.AdditiveBlending, color: 0xcfe2ff }));
+  s.renderOrder = 4; carTilt.add(s); glows.push(s);
+});
+const tmpV = new THREE.Vector3();
+// downwash columns: soft vertical gradients from each nozzle to the floor
+function jetTexture() {
+  const c = document.createElement('canvas'); c.width = 64; c.height = 256; const g = c.getContext('2d');
+  const v = g.createLinearGradient(0, 0, 0, 256); v.addColorStop(0, 'rgba(225,236,255,0.9)'); v.addColorStop(0.5, 'rgba(200,220,255,0.35)'); v.addColorStop(1, 'rgba(200,220,255,0)');
+  g.fillStyle = v; g.fillRect(0, 0, 64, 256);
+  g.globalCompositeOperation = 'destination-in';
+  const h = g.createLinearGradient(0, 0, 64, 0); h.addColorStop(0, 'rgba(0,0,0,0)'); h.addColorStop(0.5, 'rgba(0,0,0,1)'); h.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = h; g.fillRect(0, 0, 64, 256);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const jetTex = jetTexture();
+const jets = NOZZLES.slice(0, 4).map(() => {
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: jetTex, transparent: true, depthWrite: false, opacity: 0, blending: THREE.AdditiveBlending }));
+  s.center.set(0.5, 1); s.renderOrder = 3; scene.add(s); return s;
+});
+
+function emit(count, speed) {
+  for (let k = 0; k < count && N; k++) {
+    const i = pCursor; pCursor = (pCursor + 1) % N;
+    const nz = NOZZLES[(Math.random() * NOZZLES.length) | 0];
+    tmpV.set(nz[0] * carDims.x + (Math.random() - .5) * 0.5, 0.06, nz[1] * carDims.z + (Math.random() - .5) * 0.3);
+    carTilt.localToWorld(tmpV);
+    pPos[i*3] = tmpV.x; pPos[i*3+1] = tmpV.y; pPos[i*3+2] = tmpV.z;
+    pVel[i*3] = (Math.random() - .5) * 0.8; pVel[i*3+1] = -speed * (0.75 + Math.random() * 0.5); pVel[i*3+2] = (Math.random() - .5) * 0.8;
+    pAge[i] = 0; pLife[i] = 0.9 + Math.random() * 1.1; pBase[i] = 0.025 + Math.random() * 0.05;
+  }
+}
+
+function updateFX(dt) {
+  const cx = carRoot.position.x, cz = carRoot.position.z;
+  const drag = Math.exp(-dt * 1.6);
+  for (let i = 0; i < N; i++) {
+    if (pAge[i] >= pLife[i]) { pAlpha[i] = 0; continue; }
+    pAge[i] += dt;
+    let x = pPos[i*3], y = pPos[i*3+1], z = pPos[i*3+2];
+    let vx = pVel[i*3], vy = pVel[i*3+1], vz = pVel[i*3+2];
+    x += vx * dt; y += vy * dt; z += vz * dt;
+    if (y <= 0.03 && vy < 0) {             // hit the floor → spray outward along it
+      y = 0.03;
+      let dx = x - cx, dz = z - cz; const l = Math.hypot(dx, dz) || 1;
+      const sp = Math.abs(vy) * (0.8 + Math.random() * 0.5);
+      vx = dx / l * sp + (Math.random() - .5); vz = dz / l * sp + (Math.random() - .5); vy = Math.random() * 0.25;
+    } else { vx *= drag; vz *= drag; if (y > 0.03) vy = vy * Math.exp(-dt * 0.4); else vy *= drag; }
+    pPos[i*3] = x; pPos[i*3+1] = y; pPos[i*3+2] = z; pVel[i*3] = vx; pVel[i*3+1] = vy; pVel[i*3+2] = vz;
+    const t = pAge[i] / pLife[i];
+    pSize[i] = pBase[i] * (1 + t * 5);
+    pAlpha[i] = Math.pow(1 - t, 1.6) * Math.min(1, pAge[i] * 8) * 0.32;
+  }
+  pGeo.attributes.position.needsUpdate = true; pGeo.attributes.aSize.needsUpdate = true; pGeo.attributes.aAlpha.needsUpdate = true;
+
+  for (const s of haze) {
+    const u = s.userData; if (u.age >= u.life) { s.material.opacity = 0; continue; }
+    u.age += dt; const t = u.age / u.life;
+    s.position.x += u.vx * dt; s.position.z += u.vz * dt; u.vx *= Math.exp(-dt); u.vz *= Math.exp(-dt);
+    const sc = lerp(u.s0, u.s1, 1 - Math.pow(1 - t, 2)); s.scale.set(sc, sc, 1);
+    s.material.opacity = u.o * Math.sin(Math.PI * Math.min(1, t * 1.15)) ;
+  }
+  for (const r of rings) {
+    const u = r.userData; if (u.age >= u.life) { r.material.opacity = 0; continue; }
+    u.age += dt; const t = u.age / u.life;
+    const sc = lerp(0.8, u.max, 1 - Math.pow(1 - t, 3)); r.scale.set(sc, sc, 1);
+    r.material.opacity = u.o * Math.pow(1 - t, 1.5);
+  }
+}
+
+/* ================= SCROLL TIMELINE ================= */
+const stage = document.getElementById('stage');
+let K = [];          // keyframes, rebuilt on resize
+let vw = innerWidth, vh = innerHeight, aspect = vw / vh, portrait = aspect < 0.9;
+const FOV = 30, tanV = Math.tan(THREE.MathUtils.degToRad(FOV / 2));
+
+// distance at which a span of `size` metres fills `frac` of the viewport width/height
+const fitW = (size, frac) => size / (frac * 2 * tanV * aspect);
+const fitH = (size, frac) => size / (frac * 2 * tanV);
+
+function buildKeys() {
+  aspect = vw / vh; portrait = aspect < 0.9;
+  const L = carDims.x;
+  // hero: side profile, car takes ~78% width on desktop, nearly full width on phones
+  const d0 = portrait ? fitW(L, 0.98) : Math.max(fitW(L, 0.72), fitH(carDims.y, 0.30));
+  const g0 = portrait ? 0.60 : 0.80;             // where the wheels touch, as a fraction of screen height
+  const h0 = d0 * tanV * (2 * g0 - 1);
+  const x0 = portrait ? 0 : L * 0.05;
+  // close side three-quarter
+  const d2 = portrait ? fitW(L, 1.05) : fitW(L, 0.62);
+  // top-down
+  const d3 = portrait ? Math.max(fitH(L, 0.42), fitW(carDims.z, 0.42)) : fitH(L, 0.5);
+  const off3 = portrait ? d3 * tanV * 0.2 : 0;  // phones: push car up so cards fit underneath
+
+  const k = (p, o) => ({ p, ...o });
+  const base = { cx: x0, cy: 0, cz: 0, yaw: 0, pitch: 0, roll: 0, ex: x0 * 0.3, ey: h0, ez: d0, tx: x0 * 0.3, ty: h0, tz: 0, up: 0 };
+  K = [
+    k(0.00, { ...base }),
+    k(0.05, { ...base }),
+    // lift-off: rises, nose up a touch
+    k(0.15, { ...base, cx: portrait ? 0 : L * 0.1, cy: 0.45, pitch: -0.035, ey: h0 + 0.08, ty: h0 + 0.12 }),
+    k(0.26, { ...base, cx: portrait ? 0 : L * 0.16, cy: 1.15, pitch: -0.02, roll: 0.01, ey: h0 + 0.2, ty: h0 + 0.42, ez: d0 * 1.1 }),
+    k(0.31, { ...base, cx: portrait ? 0 : L * 0.18, cy: 1.2, pitch: 0, ey: h0 + 0.22, ty: h0 + 0.46, ez: d0 * 1.12 }),
+    // swing to the side: yaw into a front three-quarter, slide right, camera moves in
+    k(0.46, { cx: portrait ? 0.2 : L * 0.3, cy: 0.75, cz: 0, yaw: 0.72, pitch: 0.015, roll: -0.04,
+              ex: portrait ? 0.2 : L * 0.05, ey: portrait ? 1.6 : 2.1, ez: d2 * 1.08, tx: portrait ? 0.2 : L * 0.1, ty: portrait ? 0.95 : 1.05, tz: 0, up: 0 }),
+    k(0.60, { cx: portrait ? 0.2 : L * 0.3, cy: 0.8, cz: 0, yaw: 0.86, pitch: 0.01, roll: -0.03,
+              ex: portrait ? 0.2 : L * 0.07, ey: portrait ? 1.7 : 2.2, ez: d2 * 1.02, tx: portrait ? 0.2 : L * 0.11, ty: portrait ? 1.0 : 1.1, tz: 0, up: 0 }),
+    // going down: camera climbs overhead, car spins to point up-screen and descends
+    k(0.72, { cx: 0, cy: 0.9, cz: 0, yaw: -0.6, pitch: 0, roll: 0.05,
+              ex: 0, ey: d3 * 0.75, ez: d3 * 0.45, tx: 0, ty: 0, tz: off3 * 0.5, up: 0.6 }),
+    k(0.84, { cx: 0, cy: 0.0, cz: 0, yaw: -Math.PI / 2, pitch: 0, roll: 0,
+              ex: 0, ey: d3, ez: off3 + 0.001, tx: 0, ty: 0, tz: off3, up: 1 }),
+    k(1.00, { cx: 0, cy: 0.0, cz: 0, yaw: -Math.PI / 2, pitch: 0, roll: 0,
+              ex: 0, ey: d3 * 0.96, ez: off3 + 0.001, tx: 0, ty: 0, tz: off3, up: 1 })
+  ];
+}
+function sample(p) {
+  let i = 0; while (i < K.length - 2 && p > K[i + 1].p) i++;
+  const a = K[i], b = K[i + 1]; const t = ease(clamp((p - a.p) / (b.p - a.p)));
+  const o = {}; for (const key in a) if (key !== 'p') o[key] = lerp(a[key], b[key], t);
+  return o;
+}
+
+let pTarget = 0, pNow = 0;
+function readScroll() {
+  const r = stage.getBoundingClientRect();
+  pTarget = clamp(-r.top / (r.height - vh));
+}
+addEventListener('scroll', readScroll, { passive: true });
+
+/* ================= DOM PANELS ================= */
+const $ = id => document.getElementById(id);
+const bg1 = $('bg1'), bg2 = $('bg2'), outline = $('outline'), pHero = $('pHero'), pSide = $('pSide'), pTop = $('pTop'), cue = $('cue');
+const chips = [...pSide.querySelectorAll('.chip')];
+const cards = [...pTop.querySelectorAll('.card')];
+
+function layoutChips() {
+  chips.forEach((c, i) => {
+    if (portrait) {   // phones: stack chips under the title
+      c.style.left = (i % 2 ? 50 : 0) + 'vw'; c.style.marginLeft = 'var(--gutter)';
+      c.style.top = 'auto'; c.style.bottom = (6 + Math.floor(i / 2) * 7) + '%';
+      c.style.display = i > 3 ? 'none' : '';
+    } else {
+      c.style.left = c.dataset.x + '%'; c.style.top = c.dataset.y + '%'; c.style.bottom = 'auto'; c.style.marginLeft = '0'; c.style.display = '';
+    }
+  });
+}
+
+function updateDOM(p, state, thrust) {
+  const heroO = 1 - range(p, 0.04, 0.12);
+  pHero.style.opacity = heroO; pHero.style.transform = `translateY(${-40 * (1 - heroO)}px)`;
+  pHero.style.pointerEvents = heroO > 0.5 ? 'auto' : 'none';
+  cue.style.opacity = 1 - range(p, 0.01, 0.05);
+
+  // outline wordmark drifts up and opens its tracking as the car lifts
+  const oT = range(p, 0.03, 0.3);
+  outline.style.opacity = portrait ? 1 - range(p, 0.05, 0.13) : 1 - range(p, 0.24, 0.36);
+  outline.style.transform = `translateX(-50%) translateY(${-oT * 12}vh) scale(${1 + oT * 0.08})`;
+  outline.style.letterSpacing = (0.005 + oT * 0.06) + 'em';
+
+
+  const side = band(p, 0.40, 0.47, 0.60, 0.66);
+  pSide.style.opacity = side;
+  chips.forEach((c, i) => {
+    const t = smooth(range(p, 0.43 + i * 0.012, 0.48 + i * 0.012)) * (1 - range(p, 0.6, 0.65));
+    c.style.opacity = t; c.style.transform = `translateY(${(1 - t) * 14}px)`;
+  });
+
+  const tp = range(p, 0.82, 0.88);
+  pTop.style.opacity = tp;
+  cards.forEach((c, i) => {
+    const t = smooth(range(p, 0.83 + i * 0.01, 0.89 + i * 0.01));
+    c.style.opacity = t; c.style.transform = `translateY(${(1 - t) * 16}px)`;
+  });
+
+  // background crossfade: studio wall → overhead floor
+  const b = range(p, 0.62, 0.78);
+  bg1.style.opacity = 1 - b; bg1.style.transform = `scale(${1 + range(p, 0, 0.62) * 0.06}) translateY(${-b * 6}%)`;
+  bg2.style.opacity = b; bg2.style.transform = `scale(${1.12 - b * 0.12})`;
+}
+
+/* ================= MODEL LOADING ================= */
+const loaderEl = $('loader'), barFill = $('barFill'), loadPct = $('loadPct');
+function setPct(v) { barFill.style.width = v + '%'; loadPct.textContent = 'LOADING ' + v + '%'; }
+function finishLoading() { loaderEl.classList.add('done'); }
+
+const gltfLoader = new GLTFLoader();
+gltfLoader.load(MODEL_URL, gltf => {
+  const model = gltf.scene;
+  // upgrade materials to a satin clear-coat look
+  model.traverse(o => {
+    if (!o.isMesh) return;
+    const m = o.material;
+    const phys = new THREE.MeshPhysicalMaterial({
+      map: m.map || null, normalMap: m.normalMap || null, roughnessMap: m.roughnessMap || null, metalnessMap: m.metalnessMap || null,
+      aoMap: m.aoMap || null, emissiveMap: m.emissiveMap || null, emissive: m.emissive || new THREE.Color(0),
+      color: m.color || new THREE.Color(1, 1, 1), roughness: 0.5, metalness: 0.35,
+      clearcoat: 0.55, clearcoatRoughness: 0.22, envMapIntensity: 1.0
+    });
+    if (m.emissiveMap) phys.emissiveIntensity = 1.5;
+    o.material = phys; o.castShadow = false;
+  });
+
+  // normalise: longest horizontal axis → X, size to CAR_LEN, wheels to y=0, centred
+  let box = new THREE.Box3().setFromObject(model); let size = box.getSize(new THREE.Vector3());
+  const holder = new THREE.Group(); holder.add(model);
+  // generated meshes come out nose → +X; turn them so the nose faces left like the hero shot
+  holder.rotation.y = (size.z > size.x ? Math.PI / 2 : 0) + Math.PI;
+  if (!isNaN(MODEL_YAW)) holder.rotation.y = MODEL_YAW;
+  const wrap = new THREE.Group(); wrap.add(holder);
+  box = new THREE.Box3().setFromObject(wrap); size = box.getSize(new THREE.Vector3());
+  const s = CAR_LEN / Math.max(size.x, size.z);
+  wrap.scale.setScalar(s);
+  box = new THREE.Box3().setFromObject(wrap);
+  const c = box.getCenter(new THREE.Vector3());
+  wrap.position.set(-c.x, -box.min.y, -c.z);
+  carDims = new THREE.Box3().setFromObject(wrap).getSize(new THREE.Vector3());
+  carTilt.add(wrap);
+
+  // reflection copy with faded materials
+  const r = wrap.clone(true);
+  r.traverse(o => { if (o.isMesh) { o.material = o.material.clone(); o.material.transparent = true; o.material.depthWrite = false; o.material.opacity = 0.16; reflMats.push(o.material); } });
+  reflTilt.add(r);
+
+  // nozzle glows sit just under the floor pan
+  NOZZLES.forEach((nz, i) => { glows[i].position.set(nz[0] * carDims.x, 0.05, nz[1] * carDims.z); });
+
+  buildKeys(); readScroll(); pNow = pTarget;
+  setPct(100); setTimeout(finishLoading, 250);
+}, e => { if (e.total) setPct(Math.min(99, Math.round(e.loaded / e.total * 100))); },
+err => { console.error(err); loadPct.textContent = 'MODEL UNAVAILABLE'; setTimeout(finishLoading, 900); });
+
+/* ================= RESIZE ================= */
+function resize() {
+  vw = innerWidth; vh = document.querySelector('.sticky').clientHeight || innerHeight;
+  const dpr = Math.min(devicePixelRatio, vw < 700 ? 1.6 : 2);
+  renderer.setPixelRatio(dpr); renderer.setSize(vw, vh, false);
+  camera.aspect = vw / vh; camera.updateProjectionMatrix();
+  pMat.uniforms.uScale.value = (vh * dpr) / (2 * tanV);
+  buildKeys(); layoutChips(); readScroll();
+}
+addEventListener('resize', resize); resize();
+
+/* ================= LOOP ================= */
+// ?tick drives frames with timers (for headless previews); ?p=0..1 pins the timeline
+const schedule = qs.has('tick') ? f => setTimeout(f, 40) : requestAnimationFrame;
+let P_FORCE = qs.has('p') ? parseFloat(qs.get('p')) : null;
+if (qs.has('p')) window.__setP = v => { P_FORCE = v; };
+const clock = new THREE.Clock();
+let prevY = 0, wasAirborne = false, landedFired = false, time = 0;
+const upVec = new THREE.Vector3(), tgt = new THREE.Vector3();
+
+function frame() {
+  const dt = Math.min(clock.getDelta(), 0.05); time += dt;
+  pNow += (pTarget - pNow) * (reduceMotion ? 1 : 1 - Math.exp(-dt * 6));
+  if (P_FORCE !== null) pNow = P_FORCE;
+  const p = pNow;
+  const st = sample(p);
+
+  const airborne = st.cy > 0.04;
+  const bob = airborne && !reduceMotion ? Math.sin(time * 1.6) * 0.035 * clamp(st.cy / 0.4) : 0;
+  const y = st.cy + bob;
+  carRoot.position.set(st.cx, y, st.cz); carRoot.rotation.y = st.yaw;
+  carTilt.rotation.z = st.pitch + (airborne ? Math.sin(time * 1.1) * 0.006 : 0);
+  carTilt.rotation.x = st.roll + (airborne ? Math.sin(time * 0.9 + 1) * 0.008 : 0);
+
+  // reflection mirrors the car under the floor, fading as it rises or as we go overhead
+  reflCar.position.copy(carRoot.position); reflCar.rotation.y = st.yaw;
+  reflTilt.rotation.copy(carTilt.rotation);
+  const reflO = 0.16 * (1 - clamp(y / 1.6)) * (1 - range(p, 0.5, 0.66));
+  reflMats.forEach(m => m.opacity = reflO); reflRoot.visible = reflO > 0.004;
+
+  // contact shadow
+  const sh = clamp(1 - y / 2.2);
+  shadow.position.set(st.cx, 0.004, st.cz); shadow.rotation.z = st.yaw;
+  shadow.scale.set(carDims.x * (1.15 + (1 - sh) * 0.6), carDims.z * (1.5 + (1 - sh) * 0.8), 1);
+  shadow.material.opacity = 0.85 * sh * sh;
+
+  // thrust: holds while airborne, spikes while climbing/descending
+  const vy = (y - prevY) / Math.max(dt, 1e-3); prevY = y;
+  const hover = clamp(st.cy / 0.25);
+  const thrust = clamp(hover * 0.55 + Math.abs(vy) * 0.35);
+  if (!reduceMotion && hover > 0) emit(Math.round((60 + 520 * thrust) * dt + Math.random()), 4.5 + thrust * 4);
+  jets.forEach((j, i) => {
+    const nz = NOZZLES[i]; tmpV.set(nz[0] * carDims.x, 0.05, nz[1] * carDims.z); carTilt.localToWorld(tmpV);
+    j.position.copy(tmpV); const h = Math.max(0.01, tmpV.y);
+    j.scale.set(0.35 + h * 0.35, h * 1.05, 1); j.material.opacity = reduceMotion ? 0 : thrust * 0.4 * clamp(h / 0.2) * (0.85 + Math.random() * 0.15);
+  });
+  glows.forEach((g, i) => { g.material.opacity = thrust * (i === 4 ? 0.5 : 0.85); const gs = 0.35 + thrust * 0.45; g.scale.set(gs, gs * 0.6, 1); });
+
+  // lift-off and touchdown moments
+  if (airborne && !wasAirborne) { shockwave(st.cx, st.cz, 1); puff(st.cx, st.cz, 8, 1); emit(220, 7); landedFired = false; }
+  if (!airborne && wasAirborne && !landedFired) { shockwave(st.cx, st.cz, 0.9); puff(st.cx, st.cz, 10, 1.2); landedFired = true; }
+  wasAirborne = airborne;
+  if (!reduceMotion && airborne && Math.random() < dt * 2.2 * thrust) puff(st.cx, st.cz, 1, 0.6);
+  updateFX(dt);
+
+  // camera
+  camera.position.set(st.ex, st.ey, st.ez);
+  tgt.set(st.tx, st.ty, st.tz);
+  upVec.set(0, 1 - st.up, -st.up).normalize();
+  camera.up.copy(upVec); camera.lookAt(tgt);
+
+  updateDOM(p, st, thrust);
+  renderer.render(scene, camera);
+  schedule(frame);
+}
+schedule(frame);
+
+/* ================= LIGHTS TOGGLE ================= */
+$('lightsToggle').addEventListener('click', e => {
+  const on = e.currentTarget.getAttribute('aria-pressed') !== 'true';
+  e.currentTarget.setAttribute('aria-pressed', on);
+  renderer.toneMappingExposure = on ? 1.05 : 0.7;
+  key.intensity = on ? 2.2 : 1.1; rim.intensity = on ? 2.6 : 3.4;
+});
+</script>
+
+<script>
+/* ---------- page chrome (non-3D) ---------- */
+(() => {
+  const nav = document.getElementById('nav');
+  addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 40), { passive: true });
+
+  const menuBtn = document.getElementById('menuBtn'), links = document.getElementById('navLinks');
+  menuBtn.addEventListener('click', () => { const o = links.classList.toggle('open'); menuBtn.setAttribute('aria-expanded', o); });
+  links.addEventListener('click', e => { if (e.target.tagName === 'A') { links.classList.remove('open'); menuBtn.setAttribute('aria-expanded', false); } });
+
+  const langBtn = document.getElementById('langBtn'), langMenu = document.getElementById('langMenu');
+  langBtn.addEventListener('click', e => { e.stopPropagation(); const o = langMenu.classList.toggle('open'); langBtn.setAttribute('aria-expanded', o); });
+  langMenu.addEventListener('click', e => { const l = e.target.dataset.l; if (l) document.getElementById('langLabel').textContent = l; });
+  addEventListener('click', () => { langMenu.classList.remove('open'); langBtn.setAttribute('aria-expanded', false); });
+
+})();
+</script>
+</body>
+</html>
